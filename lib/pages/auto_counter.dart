@@ -2,16 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/web_socket_client.dart';
 
-// Create a StateProvider
-// for auto dispose, use StateProvider.autoDispose
-// for non auto dispose, use StateProvider
-final counterProvider = StreamProvider<int>((ref) {
-  final client = ref.watch(webSocketClientProvider);
-  return client.getCounterStream();
-});
+final webSocketClientProvider =
+    Provider<WebSocketClient>((ref) => FakeWebSocketClient());
 
-final webSocketClientProvider = Provider<WebSocketClient>((ref) {
-  return FakeWebSocketClient();
+final counterProvider = StreamProvider.family<int, int>((ref, start) {
+  final client = ref.watch(webSocketClientProvider);
+  return client.getCounterStream(start);
 });
 
 class AutoCounterPage extends ConsumerWidget {
@@ -19,7 +15,7 @@ class AutoCounterPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final counter = ref.watch(counterProvider);
+    final AsyncValue<int> counter = ref.watch(counterProvider(25));
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -27,12 +23,7 @@ class AutoCounterPage extends ConsumerWidget {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () {
-              // to reset the state
-              // ref.refresh(counterProvider);
-              // or
-              ref.invalidate(counterProvider);
-            },
+            onPressed: () {},
             icon: const Icon(Icons.refresh),
           ),
         ],

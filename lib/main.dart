@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'pages/home.dart';
 
-
-
 void main() {
   runApp(
     const ProviderScope(
